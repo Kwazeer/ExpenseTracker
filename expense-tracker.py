@@ -1,5 +1,6 @@
 import argparse
 import json
+import calendar
 from datetime import datetime
 
 
@@ -31,7 +32,9 @@ def parse_args():
     add_parser.add_argument('--amount', type=int, help='Used money')
 
     list_parser = subparser.add_parser('list', help='Show list of expenses')
+
     summary_parser = subparser.add_parser('summary', help='Summary of all expenses')
+    summary_parser.add_argument('--month', type=int, help='Summary of chosen month')
 
     delete_parser = subparser.add_parser('delete', help='Delete parser')
     delete_parser.add_argument('--id', type=int, help='ID of expense to delete')
@@ -66,11 +69,19 @@ def show_expenses():
         print(f'# {task['id']:<2}  {task['date']:<10}   {task['description']:<12}  ${task['amount']}')
 
 
-def sum_expenses():
+def sum_expenses(args):
     """Summary of all expenses"""
     tasks = load_file()
-    summary = sum(task['amount'] for task in tasks)
-    print(f'Total expenses: ${summary}')
+    month_converted = f'{args.month:02d}'
+    month_name = calendar.month_name[int(month_converted)]
+
+    # You can format DATE in JSON using strptime which is better, but I decided to shortcut and make List Comprehension
+    summary_by_month = sum([task['amount'] for task in tasks if task['date'].split('.')[1] == month_converted])
+    if args.month:
+        print(f'Total expenses for {month_name}: ${summary_by_month}')
+    else:
+        summary = sum(task['amount'] for task in tasks)
+        print(f'Total expenses: ${summary}')
 
 
 def delete_expense_by_id(args):
@@ -91,10 +102,9 @@ def main():
     if args.command == 'list':
         show_expenses()
     if args.command == 'summary':
-        sum_expenses()
+        sum_expenses(args)
     if args.command == 'delete':
         delete_expense_by_id(args)
 
 
 main()
-

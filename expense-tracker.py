@@ -33,6 +33,9 @@ def parse_args():
     list_parser = subparser.add_parser('list', help='Show list of expenses')
     summary_parser = subparser.add_parser('summary', help='Summary of all expenses')
 
+    delete_parser = subparser.add_parser('delete', help='Delete parser')
+    delete_parser.add_argument('--id', type=int, help='ID of expense to delete')
+
     args = parser.parse_args()
     return args
 
@@ -67,7 +70,17 @@ def sum_expenses():
     """Summary of all expenses"""
     tasks = load_file()
     summary = sum(task['amount'] for task in tasks)
-    print(summary)
+    print(f'Total expenses: ${summary}')
+
+
+def delete_expense_by_id(args):
+    """Deleting expense by its ID"""
+    tasks = load_file()
+    for i, task in enumerate(tasks):
+        if task['id'] == args.id:
+            del tasks[i]
+            save_file(tasks)
+            print('Expense deleter successfully')
 
 
 def main():
@@ -79,6 +92,8 @@ def main():
         show_expenses()
     if args.command == 'summary':
         sum_expenses()
+    if args.command == 'delete':
+        delete_expense_by_id(args)
 
 
 main()

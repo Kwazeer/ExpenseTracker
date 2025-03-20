@@ -31,6 +31,7 @@ def parse_args():
     add_parser.add_argument('--amount', type=int, help='Used money')
 
     list_parser = subparser.add_parser('list', help='Show list of expenses')
+    summary_parser = subparser.add_parser('summary', help='Summary of all expenses')
 
     args = parser.parse_args()
     return args
@@ -62,6 +63,13 @@ def show_expenses():
         print(f'# {task['id']:<2}  {task['date']:<10}   {task['description']:<12}  ${task['amount']}')
 
 
+def sum_expenses():
+    """Summary of all expenses"""
+    tasks = load_file()
+    summary = sum(task['amount'] for task in tasks)
+    print(summary)
+
+
 def main():
     """Initializing parser"""
     args = parse_args()
@@ -69,6 +77,8 @@ def main():
         add_tracker(args)
     if args.command == 'list':
         show_expenses()
+    if args.command == 'summary':
+        sum_expenses()
 
 
 main()

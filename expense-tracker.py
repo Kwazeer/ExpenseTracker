@@ -24,11 +24,15 @@ def save_file(task):
 def parse_args():
     """Parsing arguments from terminal"""
     parser = argparse.ArgumentParser('Expense Tracker')
-    parser.add_argument('add', help='Add new expense')
-    parser.add_argument('--description', type=str, help='Описание')
-    parser.add_argument('--amount', type=int, help='Потраченная сумма')
-    args = parser.parse_args()
+    subparser = parser.add_subparsers(dest='command', help='Команды')
 
+    add_parser = subparser.add_parser('add', help='Add new expense')
+    add_parser.add_argument('--description', type=str, help='Description of expense')
+    add_parser.add_argument('--amount', type=int, help='Used money')
+
+    list_parser = subparser.add_parser('list', help='Show list of expenses')
+
+    args = parser.parse_args()
     return args
 
 
@@ -46,13 +50,25 @@ def add_tracker(data):
 
     tasks.append(user_data)
     save_file(tasks)
+    print(f'Expense added successfully (ID: {get_id})')
+
+
+def show_expenses():
+    """Listing all expenses"""
+    tasks = load_file()
+
+    print('# ID  Date               Description   Amount')
+    for task in tasks:
+        print(f'# {task['id']:<2}  {task['date']:<10}   {task['description']:<12}  ${task['amount']}')
 
 
 def main():
     """Initializing parser"""
     args = parse_args()
-    if args.add:
+    if args.command == 'add':
         add_tracker(args)
+    if args.command == 'list':
+        show_expenses()
 
 
 main()

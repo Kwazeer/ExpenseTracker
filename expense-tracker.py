@@ -70,7 +70,7 @@ def show_expenses():
 
 
 def sum_expenses(args):
-    """Summary of all expenses"""
+    """Summary of all expenses or filtrating by month"""
     tasks = load_file()
     month_converted = f'{args.month:02d}'
     month_name = calendar.month_name[int(month_converted)]

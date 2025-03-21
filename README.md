@@ -1,3 +1,6 @@
-1. Need to add error handling methods.
+## Expense Tracker to track list all of your expenses, which you can filter monthly, using <Argparse>
 
-2. There are still problems with inputs in argparse, whether it's INT or STR
+**Todo**: Add filtration by years and days also.
+
+
+https://roadmap.sh/projects/expense-tracker

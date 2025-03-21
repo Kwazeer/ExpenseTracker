@@ -25,7 +25,7 @@ def save_file(task):
 def parse_args():
     """Parsing arguments from terminal"""
     parser = argparse.ArgumentParser('Expense Tracker')
-    subparser = parser.add_subparsers(dest='command', help='Команды')
+    subparser = parser.add_subparsers(dest='command', help='Commands')
 
     add_parser = subparser.add_parser('add', help='Add new expense')
     add_parser.add_argument('--description', type=str, help='Description of expense')
@@ -46,7 +46,8 @@ def parse_args():
 def add_tracker(data):
     """Adding new expense"""
     tasks = load_file()
-    get_id = len(tasks) + 1
+    #  Autoincrement for ID
+    get_id = max([task['id'] for task in tasks], default=0) + 1
 
     user_data = {
         'id': get_id,
@@ -72,26 +73,37 @@ def show_expenses():
 def sum_expenses(args):
     """Summary of all expenses or filtrating by month"""
     tasks = load_file()
-    month_converted = f'{args.month:02d}'
-    month_name = calendar.month_name[int(month_converted)]
 
-    # You can format DATE in JSON using strptime which is better, but I decided to shortcut and make List Comprehension
-    summary_by_month = sum([task['amount'] for task in tasks if task['date'].split('.')[1] == month_converted])
-    if args.month:
-        print(f'Total expenses for {month_name}: ${summary_by_month}')
-    else:
-        summary = sum(task['amount'] for task in tasks)
-        print(f'Total expenses: ${summary}')
+    try:
+        if args.month is not None:
+            month_converted = f'{args.month:02d}'
+            month_name = calendar.month_name[int(month_converted)]
+
+            # You can format DATE in JSON using strptime which is better, but I decided to shortcut and make List
+            # Comprehension
+            summary_by_month = sum([task['amount'] for task in tasks if task['date'].split('.')[1] == month_converted])
+            print(f'Total expenses for {month_name}: ${summary_by_month}')
+        else:
+            summary = sum(task['amount'] for task in tasks)
+            print(f'Total expenses: ${summary}')
+    except IndexError:
+        print('Invalid date! Please enter appropriate month from 1 to 12.')
 
 
 def delete_expense_by_id(args):
     """Deleting expense by its ID"""
     tasks = load_file()
+    found = False
+
     for i, task in enumerate(tasks):
         if task['id'] == args.id:
             del tasks[i]
             save_file(tasks)
             print('Expense deleter successfully')
+            found = True
+            break
+    if not found:
+        print(f'Expense with ID: {args.id} was not found.')
 
 
 def main():
